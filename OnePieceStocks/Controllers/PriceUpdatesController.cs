@@ -37,36 +37,36 @@ namespace OnePieceStocks.Controllers
                 return View(request);
             }
 
+            if (!request.IsDeathEvent && (!request.CustomValue.HasValue || request.CustomValue.Value <= 0))
+            {
+                ModelState.AddModelError("", "Enter a custom flat value greater than 0.");
+                return View(request);
+            }
+
             decimal oldPrice = character.CurrentPrice;
             decimal newPrice = oldPrice;
+            decimal actualChangeAmount = 0;
 
             if (request.IsDeathEvent)
             {
                 newPrice = 0;
+                actualChangeAmount = oldPrice;
                 character.IsDead = true;
             }
             else
             {
                 decimal change = request.CustomValue ?? 0;
 
-                // Convert percent if needed
-                if (request.ChangeMode == "Percent")
-                {
-                    change = oldPrice * (change / 100m);
-                }
-
-                // 🚨 $1 PENALTY SYSTEM
                 if (request.ChangeDirection == "Decrease" && oldPrice <= 1)
                 {
-                    var holdings = await _context.Holdings
+                    var holdingsAtFloor = await _context.Holdings
                         .Include(h => h.Player)
                         .Where(h => h.CharacterId == character.Id && h.Quantity > 0)
                         .ToListAsync();
 
-                    foreach (var holding in holdings)
+                    foreach (var holding in holdingsAtFloor)
                     {
                         var tax = (change * 0.5m) * holding.Quantity;
-
                         holding.Player.Wallet -= tax;
 
                         _context.ActivityLogs.Add(new ActivityLog
@@ -77,6 +77,7 @@ namespace OnePieceStocks.Controllers
                     }
 
                     newPrice = 1;
+                    actualChangeAmount = 0;
                 }
                 else
                 {
@@ -88,18 +89,81 @@ namespace OnePieceStocks.Controllers
                     {
                         newPrice = 1;
                     }
+
+                    actualChangeAmount = Math.Abs(newPrice - oldPrice);
                 }
             }
 
             character.CurrentPrice = newPrice;
+
+            if (!request.IsDeathEvent && actualChangeAmount > 0)
+            {
+                if (request.ChangeDirection == "Increase")
+                {
+                    character.LifetimeIncreaseAmount += actualChangeAmount;
+                    character.WeeklyIncreaseAmount += actualChangeAmount;
+                    character.LifetimeIncreaseCount += 1;
+                    character.WeeklyIncreaseCount += 1;
+                }
+                else
+                {
+                    character.LifetimeDecreaseAmount += actualChangeAmount;
+                    character.WeeklyDecreaseAmount += actualChangeAmount;
+                    character.LifetimeDecreaseCount += 1;
+                    character.WeeklyDecreaseCount += 1;
+                }
+            }
+
+            if (request.IsDeathEvent)
+            {
+                character.LifetimeDecreaseAmount += actualChangeAmount;
+                character.WeeklyDecreaseAmount += actualChangeAmount;
+                character.LifetimeDecreaseCount += 1;
+                character.WeeklyDecreaseCount += 1;
+            }
+
+            var holdings = await _context.Holdings
+                .Include(h => h.Player)
+                .Where(h => h.CharacterId == character.Id && h.Quantity > 0)
+                .ToListAsync();
+
+            // WALLET ONLY CHANGES ON WINS OR DEATH
+            if (actualChangeAmount > 0)
+            {
+                foreach (var holding in holdings)
+                {
+                    var walletDelta = actualChangeAmount * holding.Quantity;
+
+                    if (request.IsDeathEvent)
+                    {
+                        holding.Player.Wallet -= walletDelta;
+
+                        _context.ActivityLogs.Add(new ActivityLog
+                        {
+                            ActivityType = "Wallet Adjustment",
+                            Message = $"{holding.Player.Name} lost {walletDelta:N0} in wallet value from {character.Name} dying."
+                        });
+                    }
+                    else if (request.ChangeDirection == "Increase")
+                    {
+                        holding.Player.Wallet += walletDelta;
+
+                        _context.ActivityLogs.Add(new ActivityLog
+                        {
+                            ActivityType = "Wallet Adjustment",
+                            Message = $"{holding.Player.Name} gained {walletDelta:N0} in wallet value from {character.Name}."
+                        });
+                    }
+                }
+            }
 
             _context.PriceHistories.Add(new PriceHistory
             {
                 CharacterId = character.Id,
                 OldPrice = oldPrice,
                 NewPrice = newPrice,
-                ChangeDirection = request.ChangeDirection,
-                ChangeMode = request.ChangeMode,
+                ChangeDirection = request.IsDeathEvent ? "Decrease" : request.ChangeDirection,
+                ChangeMode = "Flat",
                 ChangeValue = request.CustomValue ?? 0,
                 Date = DateTime.UtcNow,
                 Notes = request.Notes,

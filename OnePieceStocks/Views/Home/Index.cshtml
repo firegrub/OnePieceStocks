@@ -29,23 +29,23 @@
                 </tr>
             </thead>
             <tbody>
-            @if (gainers != null && gainers.Any())
-            {
-                foreach (var item in gainers)
+                @if (gainers != null && gainers.Any())
+                {
+                    foreach (var item in gainers)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.WeeklyIncreaseAmount.ToString("N0")</td>
+                            <td>@item.CurrentPrice.ToString("N0")</td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@item.Name</td>
-                        <td>@item.WeeklyIncreaseAmount.ToString("N0")</td>
-                        <td>@item.CurrentPrice.ToString("N0")</td>
+                        <td colspan="3">No weekly gainers yet.</td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="3">No weekly gainers yet.</td>
-                </tr>
-            }
             </tbody>
         </table>
     </div>
@@ -61,23 +61,23 @@
                 </tr>
             </thead>
             <tbody>
-            @if (losers != null && losers.Any())
-            {
-                foreach (var item in losers)
+                @if (losers != null && losers.Any())
+                {
+                    foreach (var item in losers)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.WeeklyDecreaseAmount.ToString("N0")</td>
+                            <td>@item.CurrentPrice.ToString("N0")</td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@item.Name</td>
-                        <td>@item.WeeklyDecreaseAmount.ToString("N0")</td>
-                        <td>@item.CurrentPrice.ToString("N0")</td>
+                        <td colspan="3">No weekly losers yet.</td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="3">No weekly losers yet.</td>
-                </tr>
-            }
             </tbody>
         </table>
     </div>

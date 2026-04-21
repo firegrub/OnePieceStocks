@@ -10,11 +10,6 @@ namespace OnePieceStocks.Models
         [Required]
         public string ChangeDirection { get; set; } = "Increase";
 
-        [Required]
-        public string ChangeMode { get; set; } = "Percent";
-
-        public string? PresetTier { get; set; }
-
         public decimal? CustomValue { get; set; }
 
         public bool IsDeathEvent { get; set; }

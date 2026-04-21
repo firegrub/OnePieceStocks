@@ -32,25 +32,7 @@
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="ChangeMode" class="control-label">Mode</label>
-                <select asp-for="ChangeMode" class="form-control">
-                    <option value="Percent">Percent</option>
-                    <option value="Flat">Flat</option>
-                </select>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="PresetTier" class="control-label">Preset Tier</label>
-                <select asp-for="PresetTier" class="form-control">
-                    <option value="">-- none --</option>
-                    <option value="Minor">Minor</option>
-                    <option value="Major">Major</option>
-                    <option value="Massive">Massive</option>
-                </select>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="CustomValue" class="control-label">Custom Value</label>
+                <label asp-for="CustomValue" class="control-label">Custom Flat Value</label>
                 <input asp-for="CustomValue" class="form-control" />
                 <span asp-validation-for="CustomValue" class="text-danger"></span>
             </div>
