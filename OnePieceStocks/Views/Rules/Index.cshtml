@@ -1,0 +1,30 @@
+﻿@model OnePieceStocks.Models.RulePage
+
+@{
+    ViewData["Title"] = "Rules";
+}
+
+<h1>Rules</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<p class="text-muted">
+    Last updated:
+    @(Model.LastUpdated == default ? "Never" : Model.LastUpdated.ToLocalTime().ToString("g"))
+</p>
+
+<div class="border rounded p-3 bg-light" style="white-space: pre-wrap;">
+    @Model.Content
+</div>
+
+@if (User.IsInRole("Admin"))
+{
+    <div class="mt-3">
+        <a asp-action="Edit" class="btn btn-primary">Edit Rules</a>
+    </div>
+}

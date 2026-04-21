@@ -1,0 +1,89 @@
+﻿@model OnePieceStocks.Models.Player
+
+@{
+    ViewData["Title"] = "Player Details";
+}
+
+<h1>@Model.Name</h1>
+
+<hr />
+
+<div>
+    <h4>Account</h4>
+    <p><strong>Wallet:</strong> @Model.Wallet.ToString("N0")</p>
+    <p><strong>Total Slots:</strong> @Model.TotalSlots</p>
+    <p><strong>Notes:</strong> @Model.Notes</p>
+</div>
+
+<hr />
+
+<h4>Holdings</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Character</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total Value</th>
+        </tr>
+    </thead>
+    <tbody>
+@{
+    decimal totalStock = 0;
+}
+@foreach (var h in Model.Holdings)
+{
+    var value = h.Quantity * h.Character.CurrentPrice;
+    totalStock += value;
+
+        <tr>
+            <td>@h.Character.Name</td>
+            <td>@h.Quantity</td>
+            <td>@h.Character.CurrentPrice.ToString("N0")</td>
+            <td>@value.ToString("N0")</td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<hr />
+
+<h4>Summary</h4>
+
+<p><strong>Stock Value:</strong> @totalStock.ToString("N0")</p>
+<p><strong>Total Worth:</strong> @((Model.Wallet + totalStock).ToString("N0"))</p>
+
+<hr />
+
+<h4>Trade History</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Action</th>
+            <th>Character</th>
+            <th>Quantity</th>
+            <th>Price Per Share</th>
+            <th>Total Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var trade in Model.TradeHistories.OrderByDescending(t => t.Date))
+{
+        <tr>
+            <td>@trade.Date.ToLocalTime()</td>
+            <td>@trade.TradeType</td>
+            <td>@trade.Character?.Name</td>
+            <td>@trade.Quantity</td>
+            <td>@trade.PricePerShare.ToString("N0")</td>
+            <td>@trade.TotalAmount.ToString("N0")</td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<div class="mt-3">
+    <a asp-action="Index">Back to Users</a>
+</div>

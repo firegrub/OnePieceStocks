@@ -1,0 +1,19 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h3>@ViewData["Title"]</h3>
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["StatusMessage"]
+    </div>
+}
+
+<div>
+    <p><strong>Username:</strong> @Model.Username</p>
+</div>

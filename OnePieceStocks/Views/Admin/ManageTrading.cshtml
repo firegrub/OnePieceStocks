@@ -1,0 +1,55 @@
+﻿@model OnePieceStocks.Models.TradingWindowRequest
+
+@{
+    ViewData["Title"] = "Manage Trading";
+}
+
+<h1>Manage Trading</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="mb-3">
+    <strong>Trading Open:</strong> @(ViewBag.IsTradingOpen == true ? "Yes" : "No")
+</div>
+
+<div class="mb-3">
+    <strong>Trading Closes At (UTC):</strong>
+    @(ViewBag.TradingClosesAtUtc == null ? "Not set" : ViewBag.TradingClosesAtUtc)
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="ManageTrading" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Days" class="control-label"></label>
+                <input asp-for="Days" class="form-control" />
+                <span asp-validation-for="Days" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Hours" class="control-label"></label>
+                <input asp-for="Hours" class="form-control" />
+                <span asp-validation-for="Hours" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Open Trading Window</button>
+        </form>
+
+        <form asp-action="StopTrading" method="post" class="mt-3">
+            <button type="submit" class="btn btn-danger">Stop Trading Now</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

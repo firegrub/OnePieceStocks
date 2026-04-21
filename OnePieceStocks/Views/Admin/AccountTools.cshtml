@@ -1,0 +1,42 @@
+﻿@model OnePieceStocks.Models.AdminAccountToolsModel
+
+@{
+    ViewData["Title"] = "Account Tools";
+}
+
+<h1>Account Tools</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="AccountTools" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Username" class="control-label"></label>
+                <input asp-for="Username" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="TempPassword" class="control-label">Temp Password (optional)</label>
+                <input asp-for="TempPassword" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ForcePasswordChange" class="control-label">Force Password Change</label>
+                <input asp-for="ForcePasswordChange" class="form-check-input" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PromoteToAdmin" class="control-label">Promote To Admin</label>
+                <input asp-for="PromoteToAdmin" class="form-check-input" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+    </div>
+</div>

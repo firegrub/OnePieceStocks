@@ -1,0 +1,94 @@
+﻿@model OnePieceStocks.Models.RulePage
+
+@{
+    ViewData["Title"] = "Home";
+    var gainers = ViewBag.WeeklyGainers as List<OnePieceStocks.Models.Character>;
+    var losers = ViewBag.WeeklyLosers as List<OnePieceStocks.Models.Character>;
+}
+
+<div class="text-center">
+    <h1 class="display-4">OnePieceStocks</h1>
+    <p>Welcome to the market.</p>
+    <p>
+        <a asp-controller="Rules" asp-action="Index" class="btn btn-primary">View Rules</a>
+        <a asp-controller="Leaderboard" asp-action="Index" class="btn btn-secondary">Leaderboard</a>
+    </p>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Weekly Gainers</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Character</th>
+                    <th>Increase</th>
+                    <th>Current Price</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (gainers != null && gainers.Any())
+            {
+                foreach (var item in gainers)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.WeeklyIncreaseAmount.ToString("N0")</td>
+                        <td>@item.CurrentPrice.ToString("N0")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3">No weekly gainers yet.</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Weekly Losers</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Character</th>
+                    <th>Decrease</th>
+                    <th>Current Price</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (losers != null && losers.Any())
+            {
+                foreach (var item in losers)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.WeeklyDecreaseAmount.ToString("N0")</td>
+                        <td>@item.CurrentPrice.ToString("N0")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3">No weekly losers yet.</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr />
+
+@if (Model != null)
+{
+    <h3>Rules Preview</h3>
+    <div class="border rounded p-3 bg-light" style="white-space: pre-wrap;">
+        @Model.Content
+    </div>
+}

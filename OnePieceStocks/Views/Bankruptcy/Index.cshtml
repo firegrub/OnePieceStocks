@@ -1,0 +1,27 @@
+﻿@model OnePieceStocks.Models.Player
+
+@{
+    ViewData["Title"] = "Bankruptcy";
+}
+
+<h1>Bankruptcy</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (Model == null)
+{
+    <div class="alert alert-danger">No linked player account.</div>
+}
+else
+{
+    <p><strong>Player:</strong> @Model.Name</p>
+    <p><strong>Wallet:</strong> @Model.Wallet.ToString("N0")</p>
+    <p><strong>Total Slots:</strong> @Model.TotalSlots</p>
+
+    <form asp-action="Declare" method="post">
+        <button type="submit" class="btn btn-danger">Declare Bankruptcy</button>
+    </form>
+}

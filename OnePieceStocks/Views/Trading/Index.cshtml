@@ -1,0 +1,144 @@
+﻿@model OnePieceStocks.Models.TradeRequest
+
+@{
+    ViewData["Title"] = "Trading";
+}
+
+<h1>Trading</h1>
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.TradingClosedMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.TradingClosedMessage
+    </div>
+}
+else if (ViewBag.NoLinkedPlayer == true)
+{
+    <div class="alert alert-danger">
+        No player account is linked to this username.
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Index" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="form-group mb-3">
+                        <label asp-for="PlayerId" class="control-label">Player</label>
+                        <select id="playerSelect" asp-for="PlayerId" class="form-control" asp-items="ViewBag.PlayerId"></select>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" id="playerSelect" asp-for="PlayerId" />
+                }
+
+                <div class="form-group mb-3">
+                    <label asp-for="CharacterId" class="control-label">Character</label>
+                    <select id="characterSelect" asp-for="CharacterId" class="form-control" asp-items="ViewBag.CharacterId"></select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Quantity" class="control-label"></label>
+                    <input id="quantityInput" asp-for="Quantity" class="form-control" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ActionType" class="control-label">Action</label>
+                    <select id="actionSelect" asp-for="ActionType" class="form-control">
+                        <option value="Buy">Buy</option>
+                        <option value="Sell">Sell</option>
+                    </select>
+                </div>
+
+                <div class="mt-3 mb-3">
+                    <h5 id="tradePreview">Total: 0</h5>
+                    <div id="walletNow">Current Wallet: 0</div>
+                    <div id="walletAfter">Ending Wallet: 0</div>
+                    <div id="walletWarning" class="mt-2"></div>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Submit Trade" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+
+        <script>
+            const prices = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.CharacterPrices));
+            const wallets = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.PlayerWallets));
+
+            const playerSelect = document.getElementById("playerSelect");
+            const characterSelect = document.getElementById("characterSelect");
+            const quantityInput = document.getElementById("quantityInput");
+            const actionSelect = document.getElementById("actionSelect");
+
+            const preview = document.getElementById("tradePreview");
+            const walletNow = document.getElementById("walletNow");
+            const walletAfter = document.getElementById("walletAfter");
+            const warning = document.getElementById("walletWarning");
+
+            function updatePreview() {
+                const playerId = playerSelect ? playerSelect.value : null;
+                const charId = characterSelect.value;
+                const qty = parseInt(quantityInput.value) || 0;
+                const action = actionSelect.value;
+
+                const currentWallet = playerId && wallets[playerId] ? Number(wallets[playerId]) : 0;
+                walletNow.innerText = `Current Wallet: ${currentWallet.toLocaleString()}`;
+
+                if (!charId || !prices[charId]) {
+                    preview.innerText = "Total: 0";
+                    walletAfter.innerText = `Ending Wallet: ${currentWallet.toLocaleString()}`;
+                    warning.innerText = "";
+                    return;
+                }
+
+                const price = Number(prices[charId]);
+                const total = price * qty;
+
+                let endingWallet = currentWallet;
+
+                if (action === "Buy") {
+                    preview.innerText = `Cost: ${total.toLocaleString()}`;
+                    endingWallet = currentWallet - total;
+                } else {
+                    preview.innerText = `Gain: ${total.toLocaleString()}`;
+                    endingWallet = currentWallet + total;
+                }
+
+                walletAfter.innerText = `Ending Wallet: ${endingWallet.toLocaleString()}`;
+
+                if (endingWallet < 0) {
+                    warning.innerText = "⚠ Not enough money for this trade";
+                    warning.style.color = "red";
+                } else {
+                    warning.innerText = "";
+                }
+            }
+
+            if (playerSelect) playerSelect.addEventListener("change", updatePreview);
+            characterSelect.addEventListener("change", updatePreview);
+            quantityInput.addEventListener("input", updatePreview);
+            actionSelect.addEventListener("change", updatePreview);
+
+            updatePreview();
+        </script>
+    }
+}

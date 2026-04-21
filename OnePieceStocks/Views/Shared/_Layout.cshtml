@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - OnePieceStocks</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OnePieceStocks.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">OnePieceStocks</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Rules" asp-action="Index">Rules</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Activity" asp-action="Index">Activity</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Leaderboard" asp-action="Index">Leaderboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Weekly" asp-action="TopEarners">Weekly</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Characters" asp-action="Index">Characters</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Players" asp-action="Index">Players</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Trading" asp-action="Index">Trading</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Slots" asp-action="Index">Slots</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Bankruptcy" asp-action="Index">Bankruptcy</a>
+                        </li>
+                       
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="ManageTrading">Manage Trading</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="PriceUpdates" asp-action="Index">Price Updates</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="CreatePlayerAccount">Create Player Account</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="AccountTools">Account Tools</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - OnePieceStocks -
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+@inject OnePieceStocks.Data.ApplicationDbContext DbContext
+
+@{
+    var username = User.Identity?.Name;
+    var mustChange = false;
+
+    if (User.Identity != null && User.Identity.IsAuthenticated && username != null)
+    {
+        var player = DbContext.Players.FirstOrDefault(p => p.UserId == username);
+        if (player != null && player.MustChangePassword)
+        {
+            mustChange = true;
+        }
+    }
+}
+@if (mustChange && !Context.Request.Path.Value.Contains("/Identity/Account/Manage/ChangePassword"))
+{
+    Context.Response.Redirect("/Identity/Account/Manage/ChangePassword");
+}
+</html>

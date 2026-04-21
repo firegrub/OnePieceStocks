@@ -1,0 +1,80 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Weekly Top Earners";
+}
+
+<h1>Weekly Top Earners</h1>
+<p class="text-muted">Auto-refreshes every 30 seconds</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<h3>Top 3 Earners This Week</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Weekly Gain</th>
+            <th>Total Worth</th>
+        </tr>
+    </thead>
+    <tbody>
+@{
+    int rank = 1;
+}
+@foreach (var item in ViewBag.TopThree)
+{
+        <tr>
+            <td>@rank</td>
+            <td>@item.PlayerName</td>
+            <td>@item.WeeklyStockGain.ToString("N0")</td>
+            <td>@item.TotalWorth.ToString("N0")</td>
+        </tr>
+    rank++;
+}
+    </tbody>
+</table>
+
+<h3>All Players Weekly Ranking</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Player</th>
+            <th>Weekly Gain</th>
+            <th>Wallet</th>
+            <th>Total Worth</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>@item.PlayerName</td>
+            <td>@item.WeeklyStockGain.ToString("N0")</td>
+            <td>@item.Wallet.ToString("N0")</td>
+            <td>@item.TotalWorth.ToString("N0")</td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@if (User.IsInRole("Admin"))
+{
+    <a asp-controller="Weekly" asp-action="ResetWeek" class="btn btn-warning">
+        Reset Weekly Values
+    </a>
+}
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            location.reload();
+        }, 30000);
+    </script>
+}

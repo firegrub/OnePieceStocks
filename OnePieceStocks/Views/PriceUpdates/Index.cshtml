@@ -1,0 +1,79 @@
+﻿@model OnePieceStocks.Models.PriceUpdateRequest
+
+@{
+    ViewData["Title"] = "Price Updates";
+}
+
+<h1>Price Updates</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Index" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CharacterId" class="control-label">Character</label>
+                <select asp-for="CharacterId" class="form-control" asp-items="ViewBag.CharacterId"></select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ChangeDirection" class="control-label">Direction</label>
+                <select asp-for="ChangeDirection" class="form-control">
+                    <option value="Increase">Increase</option>
+                    <option value="Decrease">Decrease</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ChangeMode" class="control-label">Mode</label>
+                <select asp-for="ChangeMode" class="form-control">
+                    <option value="Percent">Percent</option>
+                    <option value="Flat">Flat</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PresetTier" class="control-label">Preset Tier</label>
+                <select asp-for="PresetTier" class="form-control">
+                    <option value="">-- none --</option>
+                    <option value="Minor">Minor</option>
+                    <option value="Major">Major</option>
+                    <option value="Massive">Massive</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CustomValue" class="control-label">Custom Value</label>
+                <input asp-for="CustomValue" class="form-control" />
+                <span asp-validation-for="CustomValue" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="IsDeathEvent" class="control-label">Death Event</label>
+                <input asp-for="IsDeathEvent" class="form-check-input" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Apply Update" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

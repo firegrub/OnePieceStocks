@@ -1,0 +1,95 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+<h1>Leaderboard</h1>
+<p class="text-muted">Auto-refreshes every 30 seconds</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Wallet</th>
+            <th>Stock Value</th>
+            <th>Total Worth</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@{
+    int rank = 1;
+}
+@foreach (var item in Model)
+{
+    string rowClass = "";
+
+    if (rank == 1)
+        rowClass = "table-warning";
+    else if (rank == 2)
+        rowClass = "table-light";
+    else if (rank == 3)
+        rowClass = "table-secondary";
+
+    var collapseId = $"holdings-{item.PlayerId}";
+
+        <tr class="@rowClass">
+            <td><strong>@rank</strong></td>
+            <td>@item.PlayerName</td>
+            <td>@item.Wallet.ToString("N0")</td>
+            <td>@item.StockValue.ToString("N0")</td>
+            <td><strong>@item.TotalWorth.ToString("N0")</strong></td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                    Portfolio
+                </button>
+                <a class="btn btn-sm btn-outline-secondary" asp-controller="Players" asp-action="Details" asp-route-id="@item.PlayerId">Details</a>
+            </td>
+        </tr>
+
+        <tr class="collapse" id="@collapseId">
+            <td colspan="6">
+                @if (item.Holdings.Count == 0)
+                {
+                    <div>No holdings.</div>
+                }
+                else
+                {
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Character</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var h in item.Holdings)
+                        {
+                            <tr>
+                                <td>@h.CharacterName</td>
+                                <td>@h.Quantity</td>
+                                <td>@h.Price.ToString("N0")</td>
+                                <td>@h.TotalValue.ToString("N0")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+            </td>
+        </tr>
+    rank++;
+}
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            location.reload();
+        }, 30000);
+    </script>
+}
